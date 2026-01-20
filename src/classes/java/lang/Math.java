@@ -162,4 +162,11 @@ public class Math {
 
 	  public static native double log10(double a);
 
+	  public static double toRadians(double angdeg) {
+		    return angdeg / 180.0 * PI;
+	  }
+	  public static double toDegrees(double angrad) {
+		    return angrad * 180.0 / PI;
+	  }	  
+
 }
