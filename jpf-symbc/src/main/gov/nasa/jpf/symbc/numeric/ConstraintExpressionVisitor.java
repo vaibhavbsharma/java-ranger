@@ -236,6 +236,20 @@ public abstract class ConstraintExpressionVisitor {
 
 	public void postVisit(SymbolicStringBuilder expr) {
 	}
+	/**
+	 * Called before visiting a RealIsNaN node.
+	 */
+	public void preVisit(RealIsNaN expr) {}
+
+	/**
+	 * Called to visit a RealIsNaN node.
+	 */
+	public void visitRealIsNaN(RealIsNaN expr) {}
+
+	/**
+	 * Called after visiting a RealIsNaN node.
+	 */
+	public void postVisit(RealIsNaN expr) {}
 
 
 
