@@ -104,10 +104,7 @@ public class DDIV extends gov.nasa.jpf.jvm.bytecode.DDIV {
         //super.execute(th); // pops v1, v2 and pushes r = v2 / v1;
         sf.popDouble();
         sf.popDouble();
-        if(v1==0)
-        	sf.pushDouble(0.0);
-        else
-        	sf.pushDouble(v2/v1);
+        sf.pushDouble(v2/v1);
 
         PathCondition pc;
         ChoiceGenerator<?> prev_cg = cg.getPreviousChoiceGeneratorOfType(PCChoiceGenerator.class);
@@ -118,20 +115,9 @@ public class DDIV extends gov.nasa.jpf.jvm.bytecode.DDIV {
             pc = ((PCChoiceGenerator) prev_cg).getCurrentPC();
 
         assert pc != null;
+        Comparator comparator = (condition) ? Comparator.EQ:Comparator.NE;
 
-        if (condition) { // check div by zero
-        	
-            pc._addDet(Comparator.EQ, sym_v1, 0);
-            if (pc.simplify()) { // satisfiable
-                ((PCChoiceGenerator) cg).setCurrentPC(pc);
-                
-                return th.createAndThrowException("java.lang.ArithmeticException", "!!!div by 0");
-            } else {
-                th.getVM().getSystemState().setIgnored(true);
-                return getNext(th);
-            }
-        } else {
-            pc._addDet(Comparator.NE, sym_v1, 0);
+            pc._addDet(comparator, sym_v1, 0);
             if (pc.simplify()) { // satisfiable
                 ((PCChoiceGenerator) cg).setCurrentPC(pc);
 
@@ -150,7 +136,7 @@ public class DDIV extends gov.nasa.jpf.jvm.bytecode.DDIV {
                 th.getVM().getSystemState().setIgnored(true);
                 return getNext(th);
             }
-        }
+
 
     }
 

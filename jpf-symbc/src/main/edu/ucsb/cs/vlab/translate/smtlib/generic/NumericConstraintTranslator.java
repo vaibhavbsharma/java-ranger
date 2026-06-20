@@ -42,7 +42,11 @@ public abstract class NumericConstraintTranslator extends NormalFormTranslator<C
 	public List<String> transformChain(Constraint instance, List<String> collection) {
 		if (instance == null)
 			return collection;
-		if (!GreenConstraint.class.isInstance(instance))
+		if (instance instanceof RealConstraint){
+			// throw new UnsupportedOperationException(" Constraints are being dropped");
+			return transformChain(instance.getTail(), collection);
+		} else
+			if (!GreenConstraint.class.isInstance(instance))
 			collection.add(transform(instance));
 		else {
 			// TODO translate GreenConstraint to a solver string
@@ -153,7 +157,7 @@ public abstract class NumericConstraintTranslator extends NormalFormTranslator<C
 			l = c.getLeft();
 			r = c.getRight();
 
-			String a = manager.numExpr.collect((IntegerExpression) l);
+			String a = manager.numExpr.collect((IntegerExpression) l); // throws classcastexception for realexpressions
 			String b = manager.numExpr.collect((IntegerExpression) r);
 			Comparator cmp = c.getComparator();
 
