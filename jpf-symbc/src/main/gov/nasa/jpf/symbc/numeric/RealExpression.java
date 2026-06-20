@@ -85,13 +85,17 @@ public abstract class RealExpression extends Expression {
 
 	public RealExpression _div (double i) 
 	{
-		assert (i!=0);
+		// assert (i!=0);
 		return new BinaryRealExpression(this, DIV, new RealConstant(i));
 	}
 	
 	public RealExpression _div (RealExpression e) 
 	{
 		return new BinaryRealExpression(this, DIV, e);
+	}
+
+	public RealExpression _rem(RealExpression e){
+		return new BinaryRealExpression(this, REM, e);
 	}
 	
 	public RealExpression _neg () 

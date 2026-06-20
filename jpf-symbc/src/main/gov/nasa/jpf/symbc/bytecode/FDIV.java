@@ -26,7 +26,6 @@ import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
-import gov.nasa.jpf.vm.Types;
 
 /**
  * YN: fixed choice selection in symcrete support (Yannic Noller <nolleryc@gmail.com>)
@@ -42,8 +41,8 @@ public class FDIV extends gov.nasa.jpf.jvm.bytecode.FDIV {
         float v1 = sf.peekFloat(0);
         RealExpression sym_v2 = (RealExpression) sf.getOperandAttr(1);
         float v2 = sf.peekFloat(1);
-        if (v1 == 0)
-            return th.createAndThrowException("java.lang.ArithmeticException", "div by 0");
+//        if (v1 == 0)
+//            return th.createAndThrowException("java.lang.ArithmeticException", "div by 0");
 
         if (sym_v1 == null) {
             Instruction next_insn = super.execute(th);
@@ -87,37 +86,29 @@ public class FDIV extends gov.nasa.jpf.jvm.bytecode.FDIV {
 
         assert pc != null;
 
-        if (condition) { // check div by zero
-            pc._addDet(Comparator.EQ, sym_v1, 0);
-            if (pc.simplify()) { // satisfiable
-                ((PCChoiceGenerator) cg).setCurrentPC(pc);
 
-                return th.createAndThrowException("java.lang.ArithmeticException", "div by 0");
-            } else {
-                th.getVM().getSystemState().setIgnored(true);
-                return getNext(th);
-            }
+        Comparator comparator = (condition) ? Comparator.EQ: Comparator.NE;
+
+        pc._addDet(comparator, sym_v1, 0);
+        if (pc.simplify()) { // satisfiable
+            ((PCChoiceGenerator) cg).setCurrentPC(pc);
+
+            // set the result
+            RealExpression result;
+            if (sym_v2 != null)
+                result = sym_v2._div(sym_v1);
+            else
+                result = sym_v1._div_reverse(v2);
+
+            sf = th.getModifiableTopFrame();
+            sf.setOperandAttr(result);
+            return getNext(th);
+
         } else {
-            pc._addDet(Comparator.NE, sym_v1, 0);
-            if (pc.simplify()) { // satisfiable
-                ((PCChoiceGenerator) cg).setCurrentPC(pc);
-
-                // set the result
-                RealExpression result;
-                if (sym_v2 != null)
-                    result = sym_v2._div(sym_v1);
-                else
-                    result = sym_v1._div_reverse(v2);
-
-                sf = th.getModifiableTopFrame();
-                sf.setOperandAttr(result);
-                return getNext(th);
-
-            } else {
-                th.getVM().getSystemState().setIgnored(true);
-                return getNext(th);
-            }
+            th.getVM().getSystemState().setIgnored(true);
+            return getNext(th);
         }
+
 
     }
 

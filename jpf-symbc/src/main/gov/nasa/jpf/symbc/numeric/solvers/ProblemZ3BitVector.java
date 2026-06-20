@@ -280,14 +280,22 @@ public class ProblemZ3BitVector extends ProblemGeneral {
         try {
             if (useFpForReals) {
                 if (this.bitVectorLength == 32) {
-                    Expr expr = ctx.mkConst(name, ctx.mkFPSort32());
-                    solver.add(ctx.mkFPGt((FPExpr) expr, ctx.mkFP(min, ctx.mkFPSort32())));
-                    solver.add(ctx.mkFPLt((FPExpr) expr, ctx.mkFP(max, ctx.mkFPSort32())));
+                    FPExpr expr = (FPExpr) ctx.mkConst(name, ctx.mkFPSort32());
+                    BoolExpr inBounds = ctx.mkAnd(
+                        ctx.mkFPGEq(expr, ctx.mkFP(min, ctx.mkFPSort32())),
+                        ctx.mkFPLEq(expr, ctx.mkFP(max, ctx.mkFPSort32())));
+                    BoolExpr isNaN = ctx.mkFPIsNaN(expr);
+                    BoolExpr isInfin = ctx.mkFPIsInfinite(expr); // tobediscussed
+                    solver.add(ctx.mkOr(inBounds, isNaN));
                     return expr;
                 } else {
-                    Expr expr = ctx.mkConst(name, ctx.mkFPSortDouble());
-                    solver.add(ctx.mkFPGt((FPExpr) expr, ctx.mkFP(min, ctx.mkFPSortDouble())));
-                    solver.add(ctx.mkFPLt((FPExpr) expr, ctx.mkFP(max, ctx.mkFPSortDouble())));
+                    FPExpr expr = (FPExpr) ctx.mkConst(name, ctx.mkFPSortDouble());
+                    BoolExpr inBounds = ctx.mkAnd(
+                        ctx.mkFPGEq(expr, ctx.mkFP(min, ctx.mkFPSortDouble())),
+                        ctx.mkFPLEq(expr, ctx.mkFP(max, ctx.mkFPSortDouble())));
+                    BoolExpr isNaN = ctx.mkFPIsNaN(expr);
+                    BoolExpr isInfin = ctx.mkFPIsInfinite(expr); // tobediscussed
+                    solver.add(ctx.mkOr(inBounds, isNaN));
                     return expr;
                 }
             } else {
@@ -339,6 +347,9 @@ public class ProblemZ3BitVector extends ProblemGeneral {
     @Override
     public Object eq(Object exp1, Object exp2) {
         try {
+            if (useFpForReals && exp1 instanceof FPExpr && exp2 instanceof FPExpr) {
+                return ctx.mkFPEq((FPExpr) exp1, (FPExpr) exp2);
+            }
             return ctx.mkEq((Expr) exp1, (Expr) exp2);
         } catch (Exception e) {
             e.printStackTrace();
@@ -383,6 +394,9 @@ public class ProblemZ3BitVector extends ProblemGeneral {
     @Override
     public Object neq(Object exp1, Object exp2) {
         try {
+            if (useFpForReals && exp1 instanceof FPExpr && exp2 instanceof FPExpr) {
+                return ctx.mkNot(ctx.mkFPEq((FPExpr) exp1, (FPExpr) exp2));
+            }
             return ctx.mkNot(ctx.mkEq((Expr) exp1, (Expr) exp2));
         } catch (Exception e) {
             e.printStackTrace();
@@ -834,6 +848,8 @@ public class ProblemZ3BitVector extends ProblemGeneral {
                 return ctx.mkBVSDiv((BitVecExpr) exp1, (BitVecExpr) exp2);
             } else if (exp1 instanceof IntExpr && exp2 instanceof IntExpr) {
                 return ctx.mkDiv((IntExpr) exp1, (IntExpr) exp2);
+            } else if (useFpForReals) {
+                return ctx.mkFPDiv(ctx.mkFPRoundNearestTiesToEven(),(FPExpr) exp1, (FPExpr) exp2);
             } else {
                 throw new RuntimeException();
             }
