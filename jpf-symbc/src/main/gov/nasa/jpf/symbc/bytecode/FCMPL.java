@@ -50,7 +50,7 @@ public class FCMPL extends gov.nasa.jpf.jvm.bytecode.FCMPL {
             if (!th.isFirstStepInsn()) { // first time around
                 /* YN: added symcrete mode */
                 // cg = new PCChoiceGenerator(3);
-                cg = new PCChoiceGenerator(SymbolicInstructionFactory.collect_constraints ? 1 : 3);
+                cg = new PCChoiceGenerator(SymbolicInstructionFactory.collect_constraints ? 1 : 4); // adding a choice for nan as an operand
                 ((PCChoiceGenerator) cg).setOffset(this.position);
                 ((PCChoiceGenerator) cg).setMethodName(this.getMethodInfo().getFullName());
                 th.getVM().getSystemState().setNextChoiceGenerator(cg);
@@ -59,7 +59,7 @@ public class FCMPL extends gov.nasa.jpf.jvm.bytecode.FCMPL {
             float v1 = Types.intToFloat(sf.pop());
             float v2 = Types.intToFloat(sf.pop());
 
-            int conditionValue = conditionValue(v1, v2);
+            int conditionValue;
 
             ChoiceGenerator<?> curCg = th.getVM().getSystemState().getChoiceGenerator();
             assert (curCg instanceof PCChoiceGenerator) : "expected PCChoiceGenerator, got: " + curCg;
@@ -100,6 +100,7 @@ public class FCMPL extends gov.nasa.jpf.jvm.bytecode.FCMPL {
                 } else {
                     ((PCChoiceGenerator) cg).setCurrentPC(pc);
                 }
+                sf.push(-1, false);
             } else if (conditionValue == 0) {
                 if (sym_v1 != null) {
                     if (sym_v2 != null) { // both are symbolic values
@@ -113,7 +114,8 @@ public class FCMPL extends gov.nasa.jpf.jvm.bytecode.FCMPL {
                 } else {
                     ((PCChoiceGenerator) cg).setCurrentPC(pc);
                 }
-            } else { // 1
+                sf.push(0, false);
+            } else if (conditionValue == 1) { // 1
                 if (sym_v1 != null) {
                     if (sym_v2 != null) { // both are symbolic values
                         pc._addDet(Comparator.GT, sym_v2, sym_v1);
@@ -126,9 +128,27 @@ public class FCMPL extends gov.nasa.jpf.jvm.bytecode.FCMPL {
                 } else {
                     ((PCChoiceGenerator) cg).setCurrentPC(pc);
                 }
+                sf.push(1, false);
+            } else { // NaN case — NE constraint
+
+                if (sym_v1 != null) {
+                    if (sym_v2 != null) {
+                        pc._addDet(Comparator.NE, sym_v1, sym_v2); // an expression check for NaN
+                    } else
+                        pc._addDet(Comparator.NE, sym_v1, v2); // an expression check for NaN
+                } else
+                    pc._addDet(Comparator.NE, v1, sym_v2);// an expression check for NaN
+
+                sf.push(-1, false);
+
+                if (!SymbolicInstructionFactory.fp) {
+                    assert false:"FCMPL Invoked when FP Flag is false!";
+                } else {
+                    ((PCChoiceGenerator) cg).setCurrentPC(pc);
+                }
             }
 
-            sf.push(conditionValue, false);
+            // sf.push(conditionValue, false);
 
             return getNext(th);
         }

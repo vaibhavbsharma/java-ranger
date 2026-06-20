@@ -45,7 +45,7 @@ public class DCMPG extends gov.nasa.jpf.jvm.bytecode.DCMPG {
             ChoiceGenerator<Integer> cg;
 
             if (!th.isFirstStepInsn()) { // first time around
-                cg = new PCChoiceGenerator(SymbolicInstructionFactory.collect_constraints ? 1 : 3);
+                cg = new PCChoiceGenerator(SymbolicInstructionFactory.collect_constraints ? 1 : 4);
                 ((PCChoiceGenerator) cg).setOffset(this.position);
                 ((PCChoiceGenerator) cg).setMethodName(this.getMethodInfo().getFullName());
                 th.getVM().getSystemState().setNextChoiceGenerator(cg);
@@ -108,7 +108,7 @@ public class DCMPG extends gov.nasa.jpf.jvm.bytecode.DCMPG {
                 } else {
                     ((PCChoiceGenerator) cg).setCurrentPC(pc);
                 }
-            } else {
+            } else if (conditionValue == 1) { // GT
                 if (sym_v1 != null) {
                     if (sym_v2 != null) { // both are symbolic values
                         pc._addDet(Comparator.GT, sym_v2, sym_v1);
@@ -121,8 +121,25 @@ public class DCMPG extends gov.nasa.jpf.jvm.bytecode.DCMPG {
                 } else {
                     ((PCChoiceGenerator) cg).setCurrentPC(pc);
                 }
+                sf.push(1, false);
+            } else { // NaN case — NE constraint
+                if (sym_v1 != null) {
+                    if (sym_v2 != null) {
+                        pc._addDet(Comparator.NE, sym_v1, sym_v2);
+                    } else
+                        pc._addDet(Comparator.NE, sym_v1, v2);
+                } else
+                    pc._addDet(Comparator.NE, v1, sym_v2);
+
+                sf.push(1, false);
+
+                if (!SymbolicInstructionFactory.fp) {
+                    assert false:"DCMPG Invoked when FP Flag is false!";
+                } else {
+                    ((PCChoiceGenerator) cg).setCurrentPC(pc);
+                }
             }
-            sf.push(conditionValue, false);
+            // sf.push(conditionValue, false);
             return getNext(th);
         }
     }
