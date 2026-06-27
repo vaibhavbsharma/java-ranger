@@ -138,7 +138,6 @@ public class DCMPL extends gov.nasa.jpf.jvm.bytecode.DCMPL {
                     ((PCChoiceGenerator) cg).setCurrentPC(pc);
                 }
             }
-            // sf.push(conditionValue, false);
             return getNext(th);
         }
     }

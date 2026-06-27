@@ -50,7 +50,7 @@ public class FCMPL extends gov.nasa.jpf.jvm.bytecode.FCMPL {
             if (!th.isFirstStepInsn()) { // first time around
                 /* YN: added symcrete mode */
                 // cg = new PCChoiceGenerator(3);
-                cg = new PCChoiceGenerator(SymbolicInstructionFactory.collect_constraints ? 1 : 4); // adding a choice for nan as an operand
+                cg = new PCChoiceGenerator(SymbolicInstructionFactory.collect_constraints ? 1 : 4);
                 ((PCChoiceGenerator) cg).setOffset(this.position);
                 ((PCChoiceGenerator) cg).setMethodName(this.getMethodInfo().getFullName());
                 th.getVM().getSystemState().setNextChoiceGenerator(cg);
@@ -133,11 +133,11 @@ public class FCMPL extends gov.nasa.jpf.jvm.bytecode.FCMPL {
 
                 if (sym_v1 != null) {
                     if (sym_v2 != null) {
-                        pc._addDet(Comparator.NE, sym_v1, sym_v2); // an expression check for NaN
+                        pc._addDet(Comparator.NE, sym_v1, sym_v2);
                     } else
-                        pc._addDet(Comparator.NE, sym_v1, v2); // an expression check for NaN
+                        pc._addDet(Comparator.NE, sym_v1, v2);
                 } else
-                    pc._addDet(Comparator.NE, v1, sym_v2);// an expression check for NaN
+                    pc._addDet(Comparator.NE, v1, sym_v2);
 
                 sf.push(-1, false);
 
@@ -147,8 +147,6 @@ public class FCMPL extends gov.nasa.jpf.jvm.bytecode.FCMPL {
                     ((PCChoiceGenerator) cg).setCurrentPC(pc);
                 }
             }
-
-            // sf.push(conditionValue, false);
 
             return getNext(th);
         }

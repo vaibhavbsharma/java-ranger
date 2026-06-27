@@ -142,7 +142,6 @@ public class FCMPG extends gov.nasa.jpf.jvm.bytecode.FCMPG {
                 }
             }
 
-            // sf.push(conditionValue, false);
             return getNext(th);
         }
     }

@@ -41,9 +41,6 @@ public class FDIV extends gov.nasa.jpf.jvm.bytecode.FDIV {
         float v1 = sf.peekFloat(0);
         RealExpression sym_v2 = (RealExpression) sf.getOperandAttr(1);
         float v2 = sf.peekFloat(1);
-//        if (v1 == 0)
-//            return th.createAndThrowException("java.lang.ArithmeticException", "div by 0");
-
         if (sym_v1 == null) {
             Instruction next_insn = super.execute(th);
             if (sym_v2 != null) // result is symbolic expression
