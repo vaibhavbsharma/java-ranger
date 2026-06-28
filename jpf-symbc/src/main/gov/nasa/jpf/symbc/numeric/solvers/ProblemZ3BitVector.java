@@ -286,7 +286,11 @@ public class ProblemZ3BitVector extends ProblemGeneral {
                         ctx.mkFPLEq(expr, ctx.mkFP(max, ctx.mkFPSort32())));
                     BoolExpr isNaN = ctx.mkFPIsNaN(expr);
                     BoolExpr isInfin = ctx.mkFPIsInfinite(expr);
+                    if (SymbolicInstructionFactory.inf){
+                        solver.add(ctx.mkOr(inBounds, isNaN, isInfin));
+                    }
                     solver.add(ctx.mkOr(inBounds, isNaN));
+
                     return expr;
                 } else {
                     FPExpr expr = (FPExpr) ctx.mkConst(name, ctx.mkFPSortDouble());
@@ -295,6 +299,9 @@ public class ProblemZ3BitVector extends ProblemGeneral {
                         ctx.mkFPLEq(expr, ctx.mkFP(max, ctx.mkFPSortDouble())));
                     BoolExpr isNaN = ctx.mkFPIsNaN(expr);
                     BoolExpr isInfin = ctx.mkFPIsInfinite(expr);
+                    if (SymbolicInstructionFactory.inf){
+                        solver.add(ctx.mkOr(inBounds, isNaN, isInfin));
+                    }
                     solver.add(ctx.mkOr(inBounds, isNaN));
                     return expr;
                 }
