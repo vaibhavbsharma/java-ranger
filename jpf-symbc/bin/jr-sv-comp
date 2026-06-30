@@ -22,13 +22,23 @@ TOOL_BINARY=jpf-core/bin/jpf
 FIND_OPTIONS="-name '*.java'"
 
 while [ -n "$1" ] ; do
-case "$1" in
-  --32|--64) BIT_WIDTH="${1##--}" ; shift 1 ;;
-  --propertyfile) PROP_FILE="$2" ; shift 2 ;;
-  --graphml-witness) WITNESS_FILE="$2" ; shift 2 ;;
-  --version) echo 2025; exit 0 ;;
-  *) SRC=(`eval "find $1 $FIND_OPTIONS"`) ; BM=("${BM[@]}" "${SRC[@]}") ; shift 1 ;;
-esac
+  case "$1" in
+    --32|--64) BIT_WIDTH="${1##--}" ; shift 1 ;;
+    --propertyfile) PROP_FILE="$2" ; shift 2 ;;
+    --graphml-witness) WITNESS_FILE="$2" ; shift 2 ;;
+    --version) echo 2025; exit 0 ;;
+    *)
+      # If the argument is a directory, find all .java files inside it
+      if [ -d "$1" ]; then
+        SRC=(`find "$1" -name "*.java"`)
+        BM+=("${SRC[@]}")
+      else
+        # Otherwise assume it's a file and add it directly
+        BM+=("$1")
+      fi
+      shift 1
+      ;;
+  esac
 done
 
 #depth_limit=$1
@@ -69,7 +79,7 @@ mkdir -p $DIR/target/classes
 PWD=`pwd`
 
 # build src files from benchmark
-javac --release 8 -g -cp $PWD/java-ranger/build/classes:$DIR/target/classes:$PWD/java-ranger/lib/JSAP-2.1.jar:$PWD/java-ranger/lib/foundry-1.0.jar -d $DIR/target/classes "${BM[@]}"
+javac --release 8 -g -cp $PWD/build/classes:$DIR/target/classes:$PWD/lib/JSAP-2.1.jar:$PWD/lib/foundry-1.0.jar -d $DIR/target/classes "${BM[@]}"
 
 echo "after javac"
 
@@ -83,7 +93,7 @@ do
 
   # create configuration file
   echo "target=Main" > $DIR/config.jpf
-  echo "classpath=$PWD/java-ranger/build/classes,$DIR/target/classes" >> $DIR/config.jpf
+  echo "classpath=$PWD/build/classes,$DIR/target/classes" >> $DIR/config.jpf
   echo "symbolic.dp=z3bitvector" >> $DIR/config.jpf
   #echo "symbolic.dp=z3" >> $DIR/config.jpf
   echo "symbolic.min_int=-2147483648" >> $DIR/config.jpf
@@ -114,7 +124,7 @@ do
   cat $DIR/config.jpf
 
   # run Java Ranger
-  export LD_LIBRARY_PATH=$PWD/java-ranger/lib:$LD_LIBRARY_PATH
+  export LD_LIBRARY_PATH=$PWD/lib:$LD_LIBRARY_PATH
   echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH"
   export TARGET_CLASSPATH_WALA=$DIR/target/classes/
   echo $TARGET_CLASSPATH_WALA
