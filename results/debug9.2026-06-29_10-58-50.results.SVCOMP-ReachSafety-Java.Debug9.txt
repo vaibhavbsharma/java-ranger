@@ -1,0 +1,55 @@
+   BENCHMARK INFORMATION
+benchmark definition:    debug9.xml
+name:                    debug9
+run sets:                SVCOMP-ReachSafety-Java.Debug9
+date:                    Mon, 2026-06-29 10:58:50 +01
+tool:                    Java Ranger 2025
+tool executable:         /home/salmane/bin/jr-sv-comp
+options:
+resource limits:
+- memory:                3000.0 MB
+- time:                  900 s
+- cpu cores:             4
+hardware requirements:
+- cpu cores:             4
+- memory:                3000.0 MB
+------------------------------------------------------------
+
+   SYSTEM INFORMATION
+host:                    salmane-VivoBook-ASUSLaptop-X515EP-X515EP
+os:                      Linux-6.17.0-35-generic-x86_64-with-glibc2.39
+cpu:                     11th Gen Intel Core i5-1135G7 @ 2.40GHz
+- cores:                 8
+- max frequency:         4200.0 MHz
+- turbo boost enabled:   True
+ram:                     8005.804032 MB
+------------------------------------------------------------
+
+
+
+SVCOMP-ReachSafety-Java.Debug9
+Run set 1 of 1 with options '' and propertyfile 'None'
+
+inputfile                                       status                       cpu time   wall time        host
+-------------------------------------------------------------------------------------------------------------
+algorithms/InsertionSort-FunSat02.yml           unknown                         28.73       17.68        None
+algorithms/InsertionSort-MemSat01.yml           unknown                         30.28       17.82        None
+algorithms/MergeSortIterative-FunSat01.yml      unknown                         19.14        7.38        None
+algorithms/MergeSortIterative-FunSat02.yml      
+algorithms/MergeSortIterative-MemSat01.yml      
+argv-tasks/Base.yml                             
+argv-tasks/HotspotIntegerGenerator_false.yml    
+jbmc-regression/array1.yml                      
+jbmc-regression/arraylength1.yml                
+-------------------------------------------------------------------------------------------------------------
+Run set 1                                       done                            79.86      274.68           -
+
+Statistics:              3 Files
+  correct:               0
+    correct true:        0
+    correct false:       0
+  incorrect:             0
+    incorrect true:      0
+    incorrect false:     0
+  unknown:               3
+  Score:                 0 (max: 6)

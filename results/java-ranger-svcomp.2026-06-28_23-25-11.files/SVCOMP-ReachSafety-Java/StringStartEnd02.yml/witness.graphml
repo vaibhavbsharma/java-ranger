@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <key attr.name="originFileName" attr.type="string" for="edge" id="originfile">
+    <default>&lt;command-line&gt;</default>
+  </key>
+  <key attr.name="isViolationNode" attr.type="boolean" for="node" id="violation">
+    <default>false</default>
+  </key>
+  <key attr.name="isEntryNode" attr.type="boolean" for="node" id="entry">
+    <default>false</default>
+  </key>
+  <key attr.name="producer" attr.type="string" for="graph" id="producer"/>
+  <key attr.name="startline" attr.type="int" for="edge" id="startline"/>
+  <key attr.name="assumption" attr.type="string" for="edge" id="assumption"/>
+  <key attr.name="assumption.scope" attr.type="string" for="edge" id="assumption.scope"/>
+  <key attr.name="witness-type" attr.type="string" for="graph" id="witness-type"/>
+  <graph edgedefault="directed">
+      <data key="witness-type">violation_witness</data>
+      <data key="producer">SPF</data>
+
+       <node id="n0">
+             <data key="entry">true</data>
+       </node>
+
+       <node id="n1">
+       </node>
+
+       <node id="n2">
+       </node>
+
+       <node id="n3">
+       </node>
+
+       <node id="n4">
+             <data key="violation">true</data>
+       </node>
+       <edge source="n0" target="n1">
+         <data key="originfile">Main.java</data>
+         <data key="startline">14</data>
+         <data key="assumption">string0.equals("DE")</data>
+         <data key="assumption.scope">java::LMain;</data>
+       </edge>
+       <edge source="n1" target="n2">
+         <data key="originfile">Main.java</data>
+         <data key="startline">15</data>
+         <data key="assumption">string1.equals("tC")</data>
+         <data key="assumption.scope">java::LMain;</data>
+       </edge>
+       <edge source="n2" target="n3">
+         <data key="originfile">Main.java</data>
+         <data key="startline">16</data>
+         <data key="assumption">string2.equals("tB")</data>
+         <data key="assumption.scope">java::LMain;</data>
+       </edge>
+       <edge source="n3" target="n4">
+         <data key="originfile">Main.java</data>
+         <data key="startline">17</data>
+         <data key="assumption">string3.equals("AG")</data>
+         <data key="assumption.scope">java::LMain;</data>
+       </edge>
+
+  </graph>
+</graphml>
