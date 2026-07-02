@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <key attr.name="originFileName" attr.type="string" for="edge" id="originfile">
+    <default>&lt;command-line&gt;</default>
+  </key>
+  <key attr.name="isViolationNode" attr.type="boolean" for="node" id="violation">
+    <default>false</default>
+  </key>
+  <key attr.name="isEntryNode" attr.type="boolean" for="node" id="entry">
+    <default>false</default>
+  </key>
+  <key attr.name="producer" attr.type="string" for="graph" id="producer"/>
+  <key attr.name="startline" attr.type="int" for="edge" id="startline"/>
+  <key attr.name="assumption" attr.type="string" for="edge" id="assumption"/>
+  <key attr.name="assumption.scope" attr.type="string" for="edge" id="assumption.scope"/>
+  <key attr.name="witness-type" attr.type="string" for="graph" id="witness-type"/>
+  <graph edgedefault="directed">
+      <data key="witness-type">violation_witness</data>
+      <data key="producer">SPF</data>
+
+       <node id="n0">
+             <data key="entry">true</data>
+       </node>
+
+       <node id="n1">
+       </node>
+
+       <node id="n2">
+       </node>
+
+       <node id="n3">
+       </node>
+
+       <node id="n4">
+       </node>
+
+       <node id="n5">
+       </node>
+
+       <node id="n6">
+       </node>
+
+       <node id="n7">
+       </node>
+
+       <node id="n8">
+       </node>
+
+       <node id="n9">
+       </node>
+
+       <node id="n10">
+             <data key="violation">true</data>
+       </node>
+       <edge source="n0" target="n1">
+         <data key="originfile">Main.java</data>
+         <data key="startline">12</data>
+         <data key="assumption">d1 = 0.000496</data>
+         <data key="assumption.scope">java::LMain;</data>
+       </edge>
+       <edge source="n1" target="n2">
+         <data key="originfile">Main.java</data>
+         <data key="startline">13</data>
+         <data key="assumption">d2 = 0.000000</data>
+         <data key="assumption.scope">java::LMain;</data>
+       </edge>
+       <edge source="n2" target="n3">
+         <data key="originfile">Main.java</data>
+         <data key="startline">14</data>
+         <data key="assumption">d3 = 2.000000</data>
+         <data key="assumption.scope">java::LMain;</data>
+       </edge>
+       <edge source="n3" target="n4">
+         <data key="originfile">Main.java</data>
+         <data key="startline">15</data>
+         <data key="assumption">d4 = 2.500000</data>
+         <data key="assumption.scope">java::LMain;</data>
+       </edge>
+       <edge source="n4" target="n5">
+         <data key="originfile">Main.java</data>
+         <data key="startline">16</data>
+         <data key="assumption">d5 = 4.000000</data>
+         <data key="assumption.scope">java::LMain;</data>
+       </edge>
+       <edge source="n5" target="n6">
+         <data key="originfile">Main.java</data>
+         <data key="startline">17</data>
+         <data key="assumption">d6 = 4.000122</data>
+         <data key="assumption.scope">java::LMain;</data>
+       </edge>
+       <edge source="n6" target="n7">
+         <data key="originfile">Main.java</data>
+         <data key="startline">18</data>
+         <data key="assumption">d7 = 6.000064</data>
+         <data key="assumption.scope">java::LMain;</data>
+       </edge>
+       <edge source="n7" target="n8">
+         <data key="originfile">Main.java</data>
+         <data key="startline">19</data>
+         <data key="assumption">d8 = 33.000508</data>
+         <data key="assumption.scope">java::LMain;</data>
+       </edge>
+       <edge source="n8" target="n9">
+         <data key="originfile">Main.java</data>
+         <data key="startline">20</data>
+         <data key="assumption">d9 = 1056.017212</data>
+         <data key="assumption.scope">java::LMain;</data>
+       </edge>
+       <edge source="n9" target="n10">
+         <data key="originfile">Main.java</data>
+         <data key="startline">21</data>
+         <data key="assumption">d10 = 2304.038330</data>
+         <data key="assumption.scope">java::LMain;</data>
+       </edge>
+
+  </graph>
+</graphml>
