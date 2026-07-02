@@ -94,7 +94,7 @@ target=svcomp.double2long.Main
 #target=svcomp.StringValueOf06.Main
 #target=svcomp.demo.Demo
 
-classpath=${jpf-symbc}/build/examples,${jpf-symbc}/lib/com.ibm.wala.util-1.4.4-SNAPSHOT.jar
+classpath=${jpf-symbc}/build/examples,${jpf-symbc}/lib/com.ibm.wala.util-1.5.5-SNAPSHOT.jar
 #symbolic.dp=z3
 symbolic.dp=z3bitvector
 symbolic.min_int=-2147483648
