@@ -16,7 +16,7 @@
 #target=svcomp.shifting2.Main
 #target=svcomp.shifting.Main
 #target=svcomp.float1.Main
-#target=svcomp.double2long.Main
+target=svcomp.double2long.Main
 #target=svcomp.InsertionSort_FunSat01.Main
 #target=svcomp.MergeSortIterative_FunSat02.Main
 #target=svcomp.StaticCharMethods02.Main
@@ -92,11 +92,11 @@
 #target=svcomp.assert22.Main
 #target=svcomp.MergeSortIterative_MemSat01.Main
 #target=svcomp.StringValueOf06.Main
-target=svcomp.demo.Demo
+#target=svcomp.demo.Demo
 
 classpath=${jpf-symbc}/build/examples,${jpf-symbc}/lib/com.ibm.wala.util-1.4.4-SNAPSHOT.jar
-symbolic.dp=z3
-#symbolic.dp=z3bitvector
+#symbolic.dp=z3
+symbolic.dp=z3bitvector
 symbolic.min_int=-2147483648
 symbolic.max_int=2147483647
 symbolic.min_double=-10000.0
@@ -110,9 +110,9 @@ symbolic.jrarrays=true
 veritestingMode = 3
 recursiveDepth= 10
 singlePathOptimization=true
-#listener = .symbc.VeritestingListener
-#search.multiple_errors = true
-listener = .symbc.SymbolicListener
+listener = .symbc.VeritestingListener
+search.multiple_errors = true
+#listener = .symbc.SymbolicListener
 #,.symbc.SymbolicListener
 
 #symbolic.string_dp_timeout_ms=3000

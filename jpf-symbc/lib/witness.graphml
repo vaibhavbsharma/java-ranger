@@ -19,18 +19,7 @@
       <data key="producer">SPF</data>
 
        <node id="n0">
-             <data key="entry">true</data>
+           <data key="entry">true</data> <data key="violation">true</data>
        </node>
-
-       <node id="n1">
-             <data key="violation">true</data>
-       </node>
-       <edge source="n0" target="n1">
-         <data key="originfile">Main.java</data>
-         <data key="startline">50</data>
-         <data key="assumption">x = 25.400000</data>
-         <data key="assumption.scope">java::Lsvcomp.double2long.Main;</data>
-       </edge>
-
   </graph>
 </graphml>
