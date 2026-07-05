@@ -1,0 +1,36 @@
+classpath = /home/salmane/IdeaProjects/java-ranger/jpf-symbc/build/tests
+target = gov.nasa.jpf.symbc.fp.TestRem
+symbolic.method=gov.nasa.jpf.symbc.fp.TestRem.testNaN(sym)
+jvm.insn_factory.class=gov.nasa.jpf.symbc.SymbolicInstructionFactory
+symbolic.dp=z3bitvector
+symbolic.min_int=-2147483648
+symbolic.max_int=2147483647
+symbolic.min_double=-10000.0
+symbolic.max_double=10000.0
+#symbolic.min_float=-10000.0
+#symbolic.max_float=10000.0
+symbolic.bvlength=64
+search.depth_limit=13
+#symbolic.strings=true
+#symbolic.string_dp=z3str3
+symbolic.string_dp_timeout_ms=3000
+symbolic.lazy=on
+symbolic.jrarrays=true
+veritestingMode=4
+recursiveDepth=200
+singlePathOptimization=true
+
+symbolic.fp=true
+#symbolic.inf=true
+listener=gov.nasa.jpf.symbc.VeritestingListener
+symbolic.debug=true
+
+symbolic.optimizechoices=false
+
+
+symbolic.debug=true
+search.multiple_errors=true
+vm.path_output=true
+vm.store_steps=true
+report.console.show_steps=true
+report.console.transition=constraint,snapshot

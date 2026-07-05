@@ -440,6 +440,18 @@ public class ProblemChoco extends ProblemGeneral {
 		return null;
 	}
 
+	@Override
+	public Object rem(double exp1, Object exp2) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Object rem(Object exp1, double exp2) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	public Object logical_or(Object exp1, Object exp2) {
 		throw new RuntimeException("## Error Choco does not support LOGICAL_OR");
 	}

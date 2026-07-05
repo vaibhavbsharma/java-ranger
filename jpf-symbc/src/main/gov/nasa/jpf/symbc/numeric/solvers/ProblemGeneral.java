@@ -238,4 +238,6 @@ public abstract class ProblemGeneral{
 	public abstract Object rem(Object exp1, Object exp2) ;
 	public abstract Object rem(long exp1, Object exp2) ;
 	public abstract Object rem(Object exp1, long exp2) ;
+	public abstract Object rem(double exp1, Object exp2) ;
+	public abstract Object rem(Object exp1, double exp2) ;
 }

@@ -779,6 +779,14 @@ public class ProblemZ3BitVectorIncremental extends ProblemGeneral implements Inc
     }
   }
 
+  public Object rem(double exp1, Object exp2) {
+    throw new RuntimeException("## Error Z3: rem(double, Object) not supported");
+  }
+
+  public Object rem(Object exp1, double exp2) {
+    throw new RuntimeException("## Error Z3: rem(Object, double) not supported");
+  }
+
   public Object rem(Object exp1, Object exp2) {
     try{
       if (exp1 instanceof BitVecExpr && exp2 instanceof BitVecExpr) {

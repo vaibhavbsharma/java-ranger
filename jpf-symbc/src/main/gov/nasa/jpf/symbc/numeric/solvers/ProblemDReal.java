@@ -207,6 +207,16 @@ public abstract class ProblemDReal extends ProblemGeneral {
 		public Object rem(Object exp1, long exp2) {
 			throw new UnsupportedOperationException("## Error: dReal unsupported operation");
 		}
+
+		@Override
+		public Object rem(double exp1, Object exp2) {
+			throw new UnsupportedOperationException("## Error: dReal unsupported operation");
+		}
+
+		@Override
+		public Object rem(Object exp1, double exp2) {
+			throw new UnsupportedOperationException("## Error: dReal unsupported operation");
+		}
 	}
 
 	// ------------------------------------------------------------------------------------------------------------------
@@ -348,6 +358,16 @@ public abstract class ProblemDReal extends ProblemGeneral {
 
 		@Override
 		public Object rem(Object exp1, long exp2) {
+			throw new UnsupportedOperationException("## Error: dReal unsupported operation");
+		}
+
+		@Override
+		public Object rem(double exp1, Object exp2) {
+			throw new UnsupportedOperationException("## Error: dReal unsupported operation");
+		}
+
+		@Override
+		public Object rem(Object exp1, double exp2) {
 			throw new UnsupportedOperationException("## Error: dReal unsupported operation");
 		}
 	}

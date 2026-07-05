@@ -619,6 +619,14 @@ public class ProblemZ3Incremental extends ProblemGeneral implements IncrementalS
       throw new RuntimeException("## Error Z3: Exception caught in Z3 JNI: \n" + e);
     }
   }
+  public Object rem(double exp1, Object exp2) {
+    throw new RuntimeException("## Error Z3: rem(double, Object) not supported");
+  }
+
+  public Object rem(Object exp1, double exp2) {
+    throw new RuntimeException("## Error Z3: rem(Object, double) not supported");
+  }
+
   public Object rem(Object exp1, Object exp2) {// added by corina
     try{
       if(exp2 instanceof Integer)

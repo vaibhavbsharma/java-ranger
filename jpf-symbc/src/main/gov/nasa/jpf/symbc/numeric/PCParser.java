@@ -313,6 +313,15 @@ public class PCParser {
             return pb.and(((RealConstant)e_rightRef).value,getExpression(e_leftRef));
           else
             return pb.and(getExpression(e_leftRef),getExpression(e_rightRef));
+        case REM:
+          if (e_leftRef instanceof RealConstant && e_rightRef instanceof RealConstant)
+            throw new RuntimeException("## Error: this is not a symbolic expression");
+          else if (e_leftRef instanceof RealConstant)
+            return pb.rem(((RealConstant)e_leftRef).value, getExpression(e_rightRef));
+          else if (e_rightRef instanceof RealConstant)
+            return pb.rem(getExpression(e_leftRef), ((RealConstant)e_rightRef).value);
+          else
+            return pb.rem(getExpression(e_leftRef), getExpression(e_rightRef));
 
         default:
           throw new RuntimeException("## Error: Expression " + eRef);

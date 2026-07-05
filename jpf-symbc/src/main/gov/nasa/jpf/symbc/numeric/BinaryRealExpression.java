@@ -60,6 +60,7 @@ public class BinaryRealExpression extends RealExpression
 		   case PLUS:  return l + r;
 		   case MINUS: return l - r;
 		   case MUL:   return l * r;
+		   case REM: return l % r;
 		   case DIV:   assert(r!=0);
 			           return l/r;
            default:    throw new RuntimeException("## Error: BinaryRealSolution solution: l " + l + " op " + op + " r " + r);
