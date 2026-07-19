@@ -411,6 +411,27 @@ public class PCParser {
     RealExpression c_leftRef = (RealExpression)cRef.getLeft();
     RealExpression c_rightRef = (RealExpression)cRef.getRight();
 
+    // Unary comparators (IS_NAN, NOT_IS_NAN, IS_INF, NOT_IS_INF)
+    // have no right operand, so they must be handled before the
+    // binary switch(c_compRef) below (which expects c_rightRef to
+    // be non-null).  Each maps directly to a solver call.
+    if (c_compRef == Comparator.IS_NAN) {
+      pb.post(pb.isNan(getExpression(c_leftRef)));
+      return true;
+    }
+    if (c_compRef == Comparator.NOT_IS_NAN) {
+      pb.post(pb.logical_not(pb.isNan(getExpression(c_leftRef))));
+      return true;
+    }
+    if (c_compRef == Comparator.IS_INF) {
+      pb.post(pb.isInf(getExpression(c_leftRef)));
+      return true;
+    }
+    if (c_compRef == Comparator.NOT_IS_INF) {
+      pb.post(pb.logical_not(pb.isInf(getExpression(c_leftRef))));
+      return true;
+    }
+
     switch(c_compRef){
       case EQ:
         if (c_leftRef instanceof RealConstant && c_rightRef instanceof RealConstant) {

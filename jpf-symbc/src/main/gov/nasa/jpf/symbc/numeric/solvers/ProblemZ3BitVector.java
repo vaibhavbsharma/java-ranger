@@ -276,18 +276,47 @@ public class ProblemZ3BitVector extends ProblemGeneral {
     // }
     // }
 
+    /**
+     * Creates a Z3 FP variable whose domain models IEEE 754 single/double
+     * precision as the union of:
+     * <ol>
+     *   <li> The numeric bounds [min, max]  (via mkFPGEq / mkFPLEq)
+     *   <li> NaN  (via mkFPIsNaN) — always included
+     *   <li> Infinity  (via mkFPIsInfinite) — included only when
+     *        {@link SymbolicInstructionFactory#inf} is true
+     * </ol>
+     * Without NaN/Inf, the solver would reject valid Java float/double
+     * values that arise from division (e.g., 1.0/0.0 = +Inf).
+     */
     public Object makeRealVar(String name, double min, double max) {
         try {
             if (useFpForReals) {
                 if (this.bitVectorLength == 32) {
-                    Expr expr = ctx.mkConst(name, ctx.mkFPSort32());
-                    solver.add(ctx.mkFPGt((FPExpr) expr, ctx.mkFP(min, ctx.mkFPSort32())));
-                    solver.add(ctx.mkFPLt((FPExpr) expr, ctx.mkFP(max, ctx.mkFPSort32())));
+                    FPExpr expr = (FPExpr) ctx.mkConst(name, ctx.mkFPSort32());
+                    BoolExpr inBounds = ctx.mkAnd(
+                        ctx.mkFPGEq(expr, ctx.mkFP(min, ctx.mkFPSort32())),
+                        ctx.mkFPLEq(expr, ctx.mkFP(max, ctx.mkFPSort32())));
+                    BoolExpr isNaN = ctx.mkFPIsNaN(expr);
+                    if (SymbolicInstructionFactory.inf){
+                        BoolExpr isInfinity = ctx.mkFPIsInfinite(expr);
+                        solver.add(ctx.mkOr(inBounds, isNaN, isInfinity));
+                    } else {
+                        solver.add(ctx.mkOr(inBounds, isNaN));
+                    }
+
                     return expr;
                 } else {
-                    Expr expr = ctx.mkConst(name, ctx.mkFPSortDouble());
-                    solver.add(ctx.mkFPGt((FPExpr) expr, ctx.mkFP(min, ctx.mkFPSortDouble())));
-                    solver.add(ctx.mkFPLt((FPExpr) expr, ctx.mkFP(max, ctx.mkFPSortDouble())));
+                    FPExpr expr = (FPExpr) ctx.mkConst(name, ctx.mkFPSortDouble());
+                    BoolExpr inBounds = ctx.mkAnd(
+                        ctx.mkFPGEq(expr, ctx.mkFP(min, ctx.mkFPSortDouble())),
+                        ctx.mkFPLEq(expr, ctx.mkFP(max, ctx.mkFPSortDouble())));
+                    BoolExpr isNaN = ctx.mkFPIsNaN(expr);
+                    if (SymbolicInstructionFactory.inf){
+                        BoolExpr isInfinity = ctx.mkFPIsInfinite(expr);
+                        solver.add(ctx.mkOr(inBounds, isNaN, isInfinity));
+                    } else {
+                        solver.add(ctx.mkOr(inBounds, isNaN));
+                    }
                     return expr;
                 }
             } else {
@@ -339,6 +368,10 @@ public class ProblemZ3BitVector extends ProblemGeneral {
     @Override
     public Object eq(Object exp1, Object exp2) {
         try {
+            // Use mkFPEq for FP operands: IEEE 754 defines NaN != NaN,
+            if (useFpForReals && exp1 instanceof FPExpr && exp2 instanceof FPExpr) {
+                return ctx.mkFPEq((FPExpr) exp1, (FPExpr) exp2);
+            }
             return ctx.mkEq((Expr) exp1, (Expr) exp2);
         } catch (Exception e) {
             e.printStackTrace();
@@ -383,6 +416,10 @@ public class ProblemZ3BitVector extends ProblemGeneral {
     @Override
     public Object neq(Object exp1, Object exp2) {
         try {
+            // mkNot(mkFPEq) ensures NaN != NaN per IEEE 754.
+            if (useFpForReals && exp1 instanceof FPExpr && exp2 instanceof FPExpr) {
+                return ctx.mkNot(ctx.mkFPEq((FPExpr) exp1, (FPExpr) exp2));
+            }
             return ctx.mkNot(ctx.mkEq((Expr) exp1, (Expr) exp2));
         } catch (Exception e) {
             e.printStackTrace();
@@ -801,6 +838,9 @@ public class ProblemZ3BitVector extends ProblemGeneral {
                 return ctx.mkBVSDiv(ctx.mkBV(value, this.bitVectorLength), (BitVecExpr) exp);
             } else if (exp instanceof IntExpr) {
                 return ctx.mkDiv(ctx.mkInt(value), (IntExpr) exp);
+            } else if (useFpForReals && exp instanceof FPExpr) {
+                FPSort sort = this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64();
+                return ctx.mkFPDiv(ctx.mkFPRoundNearestTiesToEven(), ctx.mkFPNumeral(value, sort), (FPExpr) exp);
             } else {
                 throw new RuntimeException();
             }
@@ -818,6 +858,9 @@ public class ProblemZ3BitVector extends ProblemGeneral {
                 return ctx.mkBVSDiv((BitVecExpr) exp, ctx.mkBV(value, this.bitVectorLength));
             } else if (exp instanceof IntExpr) {
                 return ctx.mkDiv((IntExpr) exp, ctx.mkInt(value));
+            } else if (useFpForReals && exp instanceof FPExpr) {
+                FPSort sort = this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64();
+                return ctx.mkFPDiv(ctx.mkFPRoundNearestTiesToEven(), (FPExpr) exp, ctx.mkFPNumeral(value, sort));
             } else {
                 throw new RuntimeException();
             }
@@ -834,6 +877,8 @@ public class ProblemZ3BitVector extends ProblemGeneral {
                 return ctx.mkBVSDiv((BitVecExpr) exp1, (BitVecExpr) exp2);
             } else if (exp1 instanceof IntExpr && exp2 instanceof IntExpr) {
                 return ctx.mkDiv((IntExpr) exp1, (IntExpr) exp2);
+            } else if (useFpForReals) {
+                return ctx.mkFPDiv(ctx.mkFPRoundNearestTiesToEven(),(FPExpr) exp1, (FPExpr) exp2);
             } else {
                 throw new RuntimeException();
             }
@@ -1172,6 +1217,33 @@ public class ProblemZ3BitVector extends ProblemGeneral {
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("## Error Z3: neq(double, Object) failed.\n" + e);
+        }
+    }
+
+    // Delegates to Z3's mkFPIsNaN / mkFPIsInfinite for FP expressions.
+    // Only usable when useFpForReals is true (throws otherwise).
+
+    @Override
+    public Object isNan(Object exp) {
+        try {
+            if (useFpForReals)
+                return ctx.mkFPIsNaN((FPExpr) exp);
+            throw new RuntimeException("## Error Z3: isNan requires floating-point mode");
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("## Error Z3: isNan(Object) failed.\n" + e);
+        }
+    }
+
+    @Override
+    public Object isInf(Object exp) {
+        try {
+            if (useFpForReals)
+                return ctx.mkFPIsInfinite((FPExpr) exp);
+            throw new RuntimeException("## Error Z3: isInf requires floating-point mode");
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("## Error Z3: isInf(Object) failed.\n" + e);
         }
     }
 

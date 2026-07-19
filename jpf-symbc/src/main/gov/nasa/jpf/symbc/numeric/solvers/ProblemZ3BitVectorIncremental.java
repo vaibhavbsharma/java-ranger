@@ -218,6 +218,11 @@ public class ProblemZ3BitVectorIncremental extends ProblemGeneral implements Inc
   //        }
   //    }
 
+  // TODO: Incomplete port of NaN/Inf support.  Unlike
+  // ProblemZ3BitVector.makeRealVar, this method does NOT include
+  // NaN or Infinity in the FP variable domain and uses strict
+  // > / < bounds (excluding boundary values).
+
   public Object makeRealVar(String name, double min, double max) {
     try {
       if (useFpForReals) {
@@ -279,6 +284,10 @@ public class ProblemZ3BitVectorIncremental extends ProblemGeneral implements Inc
   }
 
   @Override
+  // TODO: Missing FP-specific mkFPEq for FPExpr operands.
+  // ProblemZ3BitVector checks useFpForReals and uses mkFPEq
+  // for correct IEEE 754 NaN equality semantics.
+
   public Object eq(Object exp1, Object exp2){
     try{
       return ctx.mkEq((Expr) exp1, (Expr) exp2);
@@ -323,6 +332,8 @@ public class ProblemZ3BitVectorIncremental extends ProblemGeneral implements Inc
   }
 
   @Override
+  // TODO: Missing FP-specific mkNot(mkFPEq) — see eq(Object, Object).
+
   public Object neq(Object exp1, Object exp2){
     try{
       return ctx.mkNot(ctx.mkEq((Expr) exp1, (Expr) exp2));
@@ -709,6 +720,9 @@ public class ProblemZ3BitVectorIncremental extends ProblemGeneral implements Inc
         return ctx.mkBVSDiv(ctx.mkBV(value, this.bitVectorLength), (BitVecExpr) exp);
       } else if (exp instanceof IntExpr) {
         return ctx.mkDiv(ctx.mkInt(value), (IntExpr) exp);
+      } else if (useFpForReals && exp instanceof FPExpr) {
+        FPSort sort = this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64();
+        return ctx.mkFPDiv(ctx.mkFPRoundNearestTiesToEven(), ctx.mkFPNumeral(value, sort), (FPExpr) exp);
       } else {
         throw new RuntimeException();
       }
@@ -726,6 +740,9 @@ public class ProblemZ3BitVectorIncremental extends ProblemGeneral implements Inc
         return ctx.mkBVSDiv((BitVecExpr) exp, ctx.mkBV(value, this.bitVectorLength));
       } else if (exp instanceof IntExpr) {
         return ctx.mkDiv((IntExpr) exp, ctx.mkInt(value));
+      } else if (useFpForReals && exp instanceof FPExpr) {
+        FPSort sort = this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64();
+        return ctx.mkFPDiv(ctx.mkFPRoundNearestTiesToEven(), (FPExpr) exp, ctx.mkFPNumeral(value, sort));
       } else {
         throw new RuntimeException();
       }
@@ -736,6 +753,10 @@ public class ProblemZ3BitVectorIncremental extends ProblemGeneral implements Inc
   }
 
   @Override
+  // TODO: Missing FP division branch for FPExpr operands
+  // (cf. ProblemZ3BitVector line 866 which adds a useFpForReals
+  // branch with mkFPDiv).
+
   public Object div(Object exp1, Object exp2){
     try {
       if (exp1 instanceof BitVecExpr && exp2 instanceof BitVecExpr) {
@@ -1080,6 +1101,33 @@ public class ProblemZ3BitVectorIncremental extends ProblemGeneral implements Inc
     } catch (Exception e) {
       e.printStackTrace();
       throw new RuntimeException("## Error Z3: neq(double, Object) failed.\n" + e);
+    }
+  }
+
+  @Override
+  // Delegates to Z3's mkFPIsNaN / mkFPIsInfinite.  These are the
+  // only NaN/Inf solver methods ported to this class.  makeRealVar,
+  // eq/neq(Object,Object), and div(Object,Object) have NOT been
+  // updated (see TODOs above).
+
+  public Object isNan(Object exp) {
+    try {
+      if (useFpForReals)
+        return ctx.mkFPIsNaN((FPExpr) exp);
+      throw new RuntimeException("## Error Z3: isNan requires floating-point mode");
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw new RuntimeException("## Error Z3: isNan(Object) failed.\n" + e);
+    }
+  }
+  public Object isInf(Object exp) {
+    try {
+      if (useFpForReals)
+        return ctx.mkFPIsInfinite((FPExpr) exp);
+      throw new RuntimeException("## Error Z3: isInf requires floating-point mode");
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw new RuntimeException("## Error Z3: isInf(Object) failed.\n" + e);
     }
   }
 
