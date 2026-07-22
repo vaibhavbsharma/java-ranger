@@ -79,8 +79,5 @@ tmp/
 # IntelliJ
 out/
 
-# JIRA plugin
-atlassian-ide-plugin.xml
-
 # Benchexec results
 results/
