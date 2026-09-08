@@ -119,7 +119,6 @@ public abstract class ProblemGeneral{
 	public abstract Object shiftR(Object exp, long value) ;
 	public abstract Object shiftR(Object exp1, Object exp2) ;
 
-
 	public abstract Object shiftUR(long value, Object exp) ;
 	public abstract Object shiftUR(Object exp, long value) ;
 	public abstract Object shiftUR(Object exp1, Object exp2) ;
@@ -133,6 +132,28 @@ public abstract class ProblemGeneral{
 	}
 	public Object cos(Object exp) {
 		throw new RuntimeException("## Error: Math.cos not supported");
+	}
+
+
+
+	public Object isNan(Object exp) {
+		throw new RuntimeException("## Error: isNan not supported");
+	}
+
+	public Object isInf(Object exp) {
+		throw new RuntimeException("## Error: isInf not supported");
+	}
+
+	public Object isZero(Object exp) {
+		throw new RuntimeException("## Error: isZero not supported");
+	}
+
+	public Object isPositive(Object exp) {
+		throw new RuntimeException("## Error: isPositive not supported");
+	}
+
+	public Object isNegative(Object exp) {
+		throw new RuntimeException("## Error: isNegative not supported");
 	}
 
 	public Object round(Object exp) {

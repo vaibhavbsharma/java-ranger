@@ -53,6 +53,26 @@ public abstract class Constraint implements Comparable<Constraint> {
     comp = c;
     right = r;
   }
+  /**
+   * Creates a unary constraint (no right operand).
+   * NaN/Inf/sign/zero class predicates (IS_NAN, NOT_IS_NAN, IS_INF, NOT_IS_INF,
+   * IS_ZERO, NOT_IS_ZERO, IS_POSITIVE, IS_NEGATIVE) are predicates on a single
+   * expression — they do not compare two values.  Setting {@code right = null}
+   * distinguishes them from binary constraints (EQ, NE, LT, etc.) in
+   * {@link #compareTo} and {@link #toString}.
+   *
+   * @param l  the expression to test
+   * @param c  must be one of the unary IEEE 754 class predicates
+   */
+  public Constraint(Expression l, Comparator c){
+	left = l;
+	comp = c;
+	right = null;
+	assert (c == Comparator.IS_NAN) || (c == Comparator.NOT_IS_NAN)
+		|| (c == Comparator.IS_INF) || (c == Comparator.NOT_IS_INF)
+		|| (c == Comparator.IS_ZERO) || (c == Comparator.NOT_IS_ZERO)
+		|| (c == Comparator.IS_POSITIVE) || (c == Comparator.IS_NEGATIVE);
+  }
 
   /** Returns the left expression. Subclasses may override to give tighter type bounds.*/
   public Expression getLeft() {
@@ -87,8 +107,10 @@ public abstract class Constraint implements Comparable<Constraint> {
   }
 
   public String stringPC() {
-    return left.stringPC() + comp.toString() + right.stringPC()
-        + ((and == null) ? "" : " && " + and.stringPC());
+    String base = (right == null)
+        ? comp.toString() + "(" + left.stringPC() + ")"
+        : left.stringPC() + comp.toString() + right.stringPC();
+    return base + ((and == null) ? "" : " && " + and.stringPC());
   }
 
   public void getVarVals(Map<String,Object> varsVals) {
@@ -104,13 +126,22 @@ public abstract class Constraint implements Comparable<Constraint> {
   }
 
   public boolean equals(Object o) {
+
+	  if (o == null){
+		  return false;
+	  }
+
     if (!(o instanceof Constraint)) {
       return false;
     }
-
-    return left.equals(((Constraint) o).left)
-        && comp.equals(((Constraint) o).comp)
-        && right.equals(((Constraint) o).right);
+    Constraint other = (Constraint) o;
+    if (left == null ? other.left != null : !left.equals(other.left)) {
+      return false;
+    }
+    if (comp != other.comp) {
+      return false;
+    }
+    return (right == null ? other.right == null : right.equals(other.right));
   }
 
   public int hashCode() {
@@ -129,18 +160,15 @@ public abstract class Constraint implements Comparable<Constraint> {
   }
 
   /**
-	 * Compare two constraints for orderedness. The function views each
-	 * constraint as a triple ({@code left}, {@code comp}, {@code right}). The
-	 * triples are compared lexicographically. Similarly, one element is less
-	 * than another if and only if (1) the first is {@code null} and the second
-	 * isn't, or (2) both are non-null and the hash code of the first is less
-	 * than the hash code of the second.
-	 * 
-	 * @param c
-	 *            the constraint to compare to
-	 * @return -1 if this constraint is less than the other, +1 if it is
-	 *         greater, and 0 if they are equal
-	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 * Lexicographic comparison of the 3-tuple ({@code comp}, {@code left},
+	 * {@code right}).  The {@code right} entry may be null for unary
+	 * constraints (IS_NAN, IS_INF, etc.); null sorts before non-null so
+	 * unary constraints precede binary ones when the first two elements
+	 * tie.  This maintains a consistent ordering: null < non-null,
+	 * which maps to -1, 0, or +1 per {@link Comparable} contract.
+	 * Used by {@link PathCondition#compareTo}.
+	 * @param c  the constraint to compare to (must not be null)
+	 * @return -1 / 0 / +1 per {@link Comparable} contract
 	 */
 	@Override
 	public final int compareTo(Constraint c) {
@@ -148,15 +176,24 @@ public abstract class Constraint implements Comparable<Constraint> {
 		if (r == 0) {
 			r = left.compareTo(c.getLeft());
 			if (r == 0) {
-				r = right.compareTo(c.getRight());
+				if (right == null && c.getRight() == null)
+					r = 0;
+				else if (right == null)
+					r = -1;
+				else if (c.getRight() == null)
+					r = 1;
+				else
+					r = right.compareTo(c.getRight());
 			}
 		}
 		return r;
 	}
   
   public String toString() {
+    if (right == null)
+      return comp.toString() + "(" + left.toString() + ")"
+          + ((and == null) ? "" : " &&\n" + and.toString());
     return left.toString() + comp.toString() + right.toString()
-        //+ ((and == null) ? "" : " && " + and.toString()); -- for specialization
         + ((and == null) ? "" : " &&\n" + and.toString());
   }
 
@@ -172,17 +209,19 @@ public abstract class Constraint implements Comparable<Constraint> {
 	public void accept(ConstraintExpressionVisitor visitor) {
 		visitor.preVisit(this);
 		left.accept(visitor);
-		right.accept(visitor);
+		if (right != null) {
+			right.accept(visitor);
+		}
 		visitor.postVisit(this);
 	}
 
 	public String prefix_notation() {
-		//return left.toString() + comp.toString() + right.toString()
-		        //+ ((and == null) ? "" : " && " + and.toString()); -- for specialization
-		  //      + ((and == null) ? "" : " &&\n" + and.toString());
 		// Sang: rewrite NE in z3's notation: (a != b) becomes (not (= a b))
-		String result = null;
-		if (comp == Comparator.NE){
+		String result;
+		if (right == null) {
+			// unary comparator: (COMP left)
+			result = "(" + comp.toString() + " " + left.prefix_notation() + ")";
+		} else if (comp == Comparator.NE){
 			result = "(not ( = " + left.prefix_notation() + " " + right.prefix_notation() +"))";
 		}
 		else{
@@ -193,12 +232,12 @@ public abstract class Constraint implements Comparable<Constraint> {
 	}
 
 	public String prefix_notationPC4Z3() {
-		//return left.toString() + comp.toString() + right.toString()
-		        //+ ((and == null) ? "" : " && " + and.toString()); -- for specialization
-		  //      + ((and == null) ? "" : " &&\n" + and.toString());
 		// Sang: rewrite NE in z3's notation: (a != b) becomes (not (= a b))
-		String result = null;
-		if (comp == Comparator.NE){
+		String result;
+		if (right == null) {
+			// unary comparator: (assert (COMP left))
+			result = "(assert (" + comp.toString() + " " + left.prefix_notation() + "))";
+		} else if (comp == Comparator.NE){
 			result = "(assert (not ( = " + left.prefix_notation() + " " + right.prefix_notation() +")))";
 		}
 		else{

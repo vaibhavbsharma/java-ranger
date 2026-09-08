@@ -234,7 +234,21 @@ public class PathCondition implements Comparable<PathCondition> {
         t = new RealConstraint(l, c, r);
 
         prependUnlessRepeated(t);
+    }
 
+    /**
+     * Adds a unary constraint on a single RealExpression to this
+     * path condition.  Used for NaN/Inf checks in FP division
+     * (FDIV/DDIV).  The comparator must be one of:
+     * IS_NAN, NOT_IS_NAN, IS_INF, NOT_IS_INF.
+     *
+     * @param l  the symbolic real expression to test (left operand)
+     * @param c  the unary comparator
+     */
+    public void _addDet(RealExpression l, Comparator c){
+        Constraint t = new RealConstraint(l, c);
+        flagSolved = false;
+        prependUnlessRepeated(t);
     }
 
     // mixed real/integer constraints to handle cast bytecodes

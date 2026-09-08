@@ -98,10 +98,14 @@ class GreenPbTranslator extends Visitor {
             int upper = (int) (double) variable.getUpperBound();
             try {
                 v = (Expr) context.makeRealVar(variable.getName(), lower, upper);
-                // now add bounds
-                Expr low = (Expr) context.geq(v, context.makeRealConst((double) lower));
-                Expr high = (Expr) context.leq(v, context.makeRealConst((double) upper));
-                domains.add((Expr) context.logical_and(low, high));
+                // In FP mode makeRealVar already posted the IEEE 754 domain
+                // (bounds + NaN + optional Inf) to the solver; the int-based
+                // geq/leq below only make sense for the non-FP RealExpr sort.
+                if (!(v instanceof FPExpr)) {
+                    Expr low = (Expr) context.geq(v, context.makeRealConst((double) lower));
+                    Expr high = (Expr) context.leq(v, context.makeRealConst((double) upper));
+                    domains.add((Expr) context.logical_and(low, high));
+                }
                 PCParser.realVariableMap.put(variable, v);
             } catch (Z3Exception e) {
                 e.printStackTrace();
@@ -286,6 +290,52 @@ class GreenPbTranslator extends Visitor {
                             operation.getOperator() + ") to Z3BitVector");
                     assert (false);
 
+            }
+        } catch (Z3Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Translates an FP class predicate ({@link FPClassExpr}) to its Z3
+     * floating-point equivalent. The operand's expression is already on the
+     * stack (pushed by {@code FPClassExpr.accept} visiting the operand first);
+     * this pops it, applies the predicate, and pushes the resulting Boolean
+     * expression. The inverse/positive-vs-negative comparators map to the
+     * negated or sign-flipped form so that the SPF {@link Comparator} semantics
+     * (sign bit based, +0.0 positive / -0.0 negative, NaN neither positive nor
+     * negative) line up with Z3's FP predicates.
+     */
+    public void postVisitFPClass(FPClassExpr expr) throws VisitorException {
+        Expr operand = stack.isEmpty() ? null : stack.pop();
+        try {
+            switch (expr.cmp) {
+                case IS_NAN:
+                    stack.push((Expr) context.isNan(operand));
+                    break;
+                case NOT_IS_NAN:
+                    stack.push((Expr) context.logical_not(context.isNan(operand)));
+                    break;
+                case IS_INF:
+                    stack.push((Expr) context.isInf(operand));
+                    break;
+                case NOT_IS_INF:
+                    stack.push((Expr) context.logical_not(context.isInf(operand)));
+                    break;
+                case IS_ZERO:
+                    stack.push((Expr) context.isZero(operand));
+                    break;
+                case NOT_IS_ZERO:
+                    stack.push((Expr) context.logical_not(context.isZero(operand)));
+                    break;
+                case IS_POSITIVE:
+                    stack.push((Expr) context.isPositive(operand));
+                    break;
+                case IS_NEGATIVE:
+                    stack.push((Expr) context.isNegative(operand));
+                    break;
+                default:
+                    throw new VisitorException("Unsupported FP class comparator " + expr.cmp);
             }
         } catch (Z3Exception e) {
             e.printStackTrace();

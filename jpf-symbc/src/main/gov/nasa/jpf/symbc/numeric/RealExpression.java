@@ -42,6 +42,16 @@ import static gov.nasa.jpf.symbc.numeric.Operator.*;
 
 public abstract class RealExpression extends Expression {
 
+	// IEEE 754 special value class constants, used as the symbolic result of an
+	// FP division arm (FDIV/DDIV).  Also usable directly in path conditions;
+	// extends to double (RealConstant stores the widened value, -0.0 keeps its
+	// sign) so one set serves both single and double precision.
+	public static RealExpression NAN      = new RealConstant(Float.NaN);
+	public static RealExpression POS_INF  = new RealConstant(Float.POSITIVE_INFINITY);
+	public static RealExpression NEG_INF  = new RealConstant(Float.NEGATIVE_INFINITY);
+	public static RealExpression POS_ZERO = new RealConstant(0.0f);
+	public static RealExpression NEG_ZERO = new RealConstant(-0.0f);
+
 	public RealExpression _minus_reverse (double i) 
 	{
 		return new BinaryRealExpression(new RealConstant(i), MINUS, this);
@@ -79,13 +89,11 @@ public abstract class RealExpression extends Expression {
 	
 	public RealExpression _div_reverse(double i) 
 	{
-		//assert (i!=0);
 		return new BinaryRealExpression(new RealConstant(i), DIV, this );
 	}
 
 	public RealExpression _div (double i) 
 	{
-		assert (i!=0);
 		return new BinaryRealExpression(this, DIV, new RealConstant(i));
 	}
 	
