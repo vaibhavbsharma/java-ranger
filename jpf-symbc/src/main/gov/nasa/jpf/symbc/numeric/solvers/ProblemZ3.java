@@ -1058,19 +1058,32 @@ public class ProblemZ3 extends ProblemGeneral {
 
 	@Override
 	public Object mixed(Object exp1, Object exp2) {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("## Error Z3 \n");
+		try {
+			if (useFpForReals) {
+				IntExpr intExpr = (IntExpr) (exp1 instanceof IntExpr ? exp1 : exp2);
+				FPExpr fpExpr = (FPExpr) (exp1 instanceof FPExpr ? exp1 : exp2);
+				RealExpr realExpr = ctx.mkInt2Real(intExpr);
+				FPExpr converted = ctx.mkFPToFP(ctx.mkFPRoundTowardZero(), realExpr, ctx.mkFPSort64());
+				return ctx.mkFPEq(fpExpr, converted);
+			} else {
+				IntExpr intExpr = (IntExpr) (exp1 instanceof IntExpr ? exp1 : exp2);
+				RealExpr realExpr = (RealExpr) (exp1 instanceof RealExpr ? exp1 : exp2);
+				return ctx.mkEq(ctx.mkInt2Real(intExpr), realExpr);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException("## Error Z3: mixed(Object, Object) failed.\n" + e);
+		}
 	}
 
     @Override
     public double getRealValueInf(Object dpVar) {
-        throw new RuntimeException("## Error Z3 \n");//return 0;
+        return getRealValue(dpVar);
     }
 
 	@Override
 	public double getRealValueSup(Object dpVar) {
-		// TODO Auto-generated method stub
-	    throw new RuntimeException("## Error Z3 \n");//return 0;
+		return getRealValue(dpVar);
 	}
 
 	@Override
@@ -1091,8 +1104,16 @@ public class ProblemZ3 extends ProblemGeneral {
 
 	@Override
 	public void postLogicalOR(Object[] constraint) {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("## Error Z3 \n");
+		try {
+			BoolExpr[] exprs = new BoolExpr[constraint.length];
+			for (int i = 0; i < constraint.length; i++) {
+				exprs[i] = (BoolExpr) constraint[i];
+			}
+			solver.add(ctx.mkOr(exprs));
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException("## Error Z3: postLogicalOR() failed.\n" + e);
+		}
 	}
 
     // Added by Aymeric to support arrays
