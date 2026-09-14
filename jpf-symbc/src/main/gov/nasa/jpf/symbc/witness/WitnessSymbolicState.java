@@ -1,5 +1,6 @@
 package gov.nasa.jpf.symbc.witness;
 
+import gov.nasa.jpf.jvm.bytecode.EXECUTENATIVE;
 import gov.nasa.jpf.jvm.bytecode.JVMInvokeInstruction;
 import gov.nasa.jpf.symbc.SymbolicListener;
 import gov.nasa.jpf.symbc.numeric.PathCondition;
@@ -93,6 +94,8 @@ public class WitnessSymbolicState {
   }
 
   public static void collectPgmNameForSymVar(Instruction instruction) {
+    if (instruction instanceof EXECUTENATIVE)
+      return;
     String strInst = instruction.toString();
     if (strInst.contains("invokestatic") && strInst.contains("Verifier.nondet")) {
       symbolicVariableInfo = new SymbolicVariableInfo();
