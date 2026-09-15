@@ -220,12 +220,12 @@ public class MinMax {
 		}
 		assert minChar < maxChar : "Illegal char range";
 
-		double z = config.getDouble("symbolic.min_double", Double.MAX_VALUE);
+		double z = config.getDouble("symbolic.min_double", -1e6);
 		if (z != Double.MAX_VALUE) {
 			minDouble = z;
 		}
 
-		z = config.getDouble("symbolic.max_double", Double.MIN_VALUE);
+		z = config.getDouble("symbolic.max_double", 1e6);
 		if (z != Double.MIN_VALUE) {
 			maxDouble = z;
 		}

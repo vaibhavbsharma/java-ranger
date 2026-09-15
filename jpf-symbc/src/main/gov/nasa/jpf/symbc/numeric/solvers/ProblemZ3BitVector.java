@@ -782,6 +782,8 @@ public class ProblemZ3BitVector extends ProblemGeneral {
                 return ctx.mkBVMul((BitVecExpr) exp1, (BitVecExpr) exp2);
             } else if (exp1 instanceof IntExpr && exp2 instanceof IntExpr) {
                 return ctx.mkMul((IntExpr) exp1, (IntExpr) exp2);
+            } else if (exp1 instanceof RealExpr && exp2 instanceof RealExpr) {
+                return ctx.mkMul((RealExpr) exp1, (RealExpr) exp2);
             } else if (exp1 instanceof FPExpr && exp2 instanceof FPExpr) {
                 return ctx.mkFPMul(ctx.mkFPRoundNearestTiesToEven(), (FPExpr) exp1, (FPExpr) exp2);}
                 else{

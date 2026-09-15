@@ -1,0 +1,15 @@
+target=TestDoubleMult
+
+classpath=${jpf-symbc}/build/examples
+sourcepath=${jpf-symbc}/src/examples
+
+symbolic.method=TestDoubleMult.testMul(sym)
+symbolic.method+=TestDoubleMult.testBounds(sym)
+
+symbolic.dp=z3bitvector
+
+symbolic.min_double=-10000.0
+symbolic.max_double=10000.0
+
+listener=.symbc.SymbolicListener
+symbolic.debug=true
