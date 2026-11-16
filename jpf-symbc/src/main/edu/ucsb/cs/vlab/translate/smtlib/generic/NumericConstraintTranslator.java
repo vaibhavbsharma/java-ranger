@@ -42,6 +42,9 @@ public abstract class NumericConstraintTranslator extends NormalFormTranslator<C
 	public List<String> transformChain(Constraint instance, List<String> collection) {
 		if (instance == null)
 			return collection;
+		if (instance.getLeft() instanceof RealExpression
+				|| instance.getRight() instanceof RealExpression)
+			return transformChain(instance.getTail(), collection);
 		if (!GreenConstraint.class.isInstance(instance))
 			collection.add(transform(instance));
 		else {

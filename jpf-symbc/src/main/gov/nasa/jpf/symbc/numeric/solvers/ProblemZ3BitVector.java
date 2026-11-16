@@ -1652,6 +1652,10 @@ public class ProblemZ3BitVector extends ProblemGeneral {
             // recall that z3 uses IEEE 754 representation of floats where Value=(−1)^sign × 1.mantissa × 2^exponent, where both
             //the 1 in the mantissa is implicit, i.e., not represented, as it allways exists.
             return Double.valueOf(pieces[0]);
+        } else if (pieces[0].equals("(-") && pieces.length == 2 && pieces[1].endsWith(")")) {
+            // Z3 prints negative FP numerals as "(- N)" (e.g., (- 2052) for -2052.0)
+            String inner = pieces[1].substring(0, pieces[1].length() - 1);
+            return -Double.parseDouble(inner);
         }
         double sig;
         int exp;
