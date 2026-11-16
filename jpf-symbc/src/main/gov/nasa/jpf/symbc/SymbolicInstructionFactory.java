@@ -585,6 +585,11 @@ public class SymbolicInstructionFactory extends gov.nasa.jpf.jvm.bytecode.Instru
 	static public boolean fp;
 
 	/*
+	 * Config flag to allow Infinity in the FP variable domain.
+	 */
+	static public boolean inf;
+
+	/*
 	 * Concolic mode where we concrete execute for now
 	 * only Math operations
 	 */
@@ -805,6 +810,10 @@ public class SymbolicInstructionFactory extends gov.nasa.jpf.jvm.bytecode.Instru
 		/* use floating point theory for reals in Z3? */
 		fp = conf.getBoolean("symbolic.fp", false);
 		if (fp&&debugMode) System.out.println("Using floating point theory for reals in Z3.");
+
+		 /* use infinites for reals in Z3? */
+		 inf = conf.getBoolean("symbolic.inf", false);
+		 if (inf&&debugMode) System.out.println("Using infinities for reals in Z3Bitvector.");
 
 		MinMax.collectMinMaxInformation(conf);
 		/* no longer required here, now read in MinMax, see line above

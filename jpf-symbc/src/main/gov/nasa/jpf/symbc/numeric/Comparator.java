@@ -44,7 +44,18 @@ public enum Comparator {
    LT(" < ")  { public Comparator not() { return GE; }},
    LE(" <= ") { public Comparator not() { return GT; }},
    GT(" > ")  { public Comparator not() { return LE; }},
-   GE(" >= ") { public Comparator not() { return LT; }};
+   GE(" >= ") { public Comparator not() { return LT; }},
+   // Unary comparators: these operate on a single expression
+   // (right operand is null in Constraint).  Used by the NaN/Inf
+   // FDIV/DDIV branch support.
+   IS_NAN(" IS_NAN ") { public Comparator not() { return NOT_IS_NAN; }},
+   NOT_IS_NAN(" NOT_IS_NAN ") { public Comparator not() { return IS_NAN; }},
+   IS_INFINITY(" IS_INFINITY ") { public Comparator not() { return NOT_IS_INFINITY; }},
+   NOT_IS_INFINITY(" NOT_IS_INFINITY ") { public Comparator not() { return IS_INFINITY; }},
+   IS_ZERO(" IS_ZERO ") { public Comparator not() { return NOT_IS_ZERO; }},
+   NOT_IS_ZERO(" NOT_IS_ZERO ") { public Comparator not() { return IS_ZERO; }},
+   IS_POSITIVE(" IS_POSITIVE ") { public Comparator not() { return IS_NEGATIVE; }},
+   IS_NEGATIVE(" IS_NEGATIVE ") { public Comparator not() { return IS_POSITIVE; }};
 
    private final String str;
 
@@ -85,6 +96,28 @@ public enum Comparator {
 			return left >= right;
 		default:
 			return false;
+		}
+	}
+	public boolean evaluate(double x){
+		switch (this){
+			case IS_NAN:
+				return Double.isNaN(x);
+			case NOT_IS_NAN:
+				return !Double.isNaN(x);
+			case IS_INFINITY:
+				return Double.isInfinite(x);
+			case NOT_IS_INFINITY:
+				return !Double.isInfinite(x);
+			case IS_ZERO:
+				return x == 0;
+			case NOT_IS_ZERO:
+				return x != 0;
+			case IS_POSITIVE:
+				return (Double.doubleToRawLongBits(x) & 0x8000000000000000L) == 0L && !Double.isNaN(x);
+			case IS_NEGATIVE:
+				return (Double.doubleToRawLongBits(x) & 0x8000000000000000L) != 0L;
+			default:
+				return false;
 		}
 	}
 }

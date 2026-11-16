@@ -135,6 +135,28 @@ public abstract class ProblemGeneral{
 		throw new RuntimeException("## Error: Math.cos not supported");
 	}
 
+
+
+	public Object isNan(Object exp) {
+		throw new RuntimeException("## Error: isNan not supported");
+	}
+
+	public Object isInf(Object exp) {
+		throw new RuntimeException("## Error: isInf not supported");
+	}
+
+	public Object isZero(Object exp) {
+		throw new RuntimeException("## Error: isZero not supported");
+	}
+
+	public Object isPositive(Object exp) {
+		throw new RuntimeException("## Error: isPositive not supported");
+	}
+
+	public Object isNegative(Object exp) {
+		throw new RuntimeException("## Error: isNegative not supported");
+	}
+
 	public Object round(Object exp) {
 		throw new RuntimeException("## Error: Math.round not supported");
 	}
