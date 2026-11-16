@@ -883,7 +883,9 @@ public class ProblemZ3BitVector extends ProblemGeneral {
 
     public Object rem(Object exp1, Object exp2) {
         try {
-            if (exp1 instanceof BitVecExpr && exp2 instanceof BitVecExpr) {
+            if (exp1 instanceof FPExpr && exp2 instanceof FPExpr) {
+                return ctx.mkFPRem((FPExpr) exp1, (FPExpr) exp2);
+            } else if (exp1 instanceof BitVecExpr && exp2 instanceof BitVecExpr) {
                 return ctx.mkBVSRem((BitVecExpr) exp1, (BitVecExpr) exp2);
             } else if (exp1 instanceof IntExpr && exp2 instanceof IntExpr) {
                 return ctx.mkRem((IntExpr) exp1, (IntExpr) exp2);
@@ -893,6 +895,34 @@ public class ProblemZ3BitVector extends ProblemGeneral {
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("## Error Z3: rem(Object, Object) failed.\n" + e);
+        }
+    }
+
+    public Object rem(double value, Object exp) {
+        try {
+            if (useFpForReals && exp instanceof FPExpr) {
+                FPSort sort = this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64();
+                return ctx.mkFPRem(ctx.mkFPNumeral(value, sort), (FPExpr) exp);
+            } else {
+                throw new RuntimeException();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("## Error Z3: rem(double, Object) failed.\n" + e);
+        }
+    }
+
+    public Object rem(Object exp, double value) {
+        try {
+            if (useFpForReals && exp instanceof FPExpr) {
+                FPSort sort = this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64();
+                return ctx.mkFPRem((FPExpr) exp, ctx.mkFPNumeral(value, sort));
+            } else {
+                throw new RuntimeException();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("## Error Z3: rem(Object, double) failed.\n" + e);
         }
     }
 

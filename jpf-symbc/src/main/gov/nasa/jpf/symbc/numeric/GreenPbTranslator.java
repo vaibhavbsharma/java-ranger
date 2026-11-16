@@ -197,7 +197,9 @@ class GreenPbTranslator extends Visitor {
                     stack.push((Expr) context.div(l, r));
                     break;
                 case MOD:
-                    if (BitVecNum.class.isInstance(r)) {
+                    if (SymbolicInstructionFactory.fp && l instanceof FPExpr && r instanceof FPExpr) {
+                        stack.push((Expr) context.rem(l, r));
+                    } else if (BitVecNum.class.isInstance(r)) {
                         int rValue = ((BitVecNum) r).getInt();
                         // if rValue is a power of 2, we can implement a mod 2^i as a & (2^i–1)
                         if ((rValue & (rValue - 1)) == 0) {

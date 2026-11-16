@@ -1,0 +1,28 @@
+classpath = ${jpf-symbc}/build/examples
+target = gov.nasa.jpf.symbc.fp.TestFREM
+
+jvm.insn_factory.class=gov.nasa.jpf.symbc.SymbolicInstructionFactory
+
+# SMT Settings
+symbolic.dp=z3bitvector
+symbolic.bvlength=64
+symbolic.fp=true
+symbolic.inf=true
+
+# Domain bounds (float-only test)
+symbolic.min_float=-10000.0
+symbolic.max_float=10000.0
+
+# Execution & Java Ranger Controls
+search.depth_limit=13
+symbolic.strings=true
+symbolic.string_dp=z3str3
+symbolic.string_dp_timeout_ms=3000
+symbolic.lazy=on
+symbolic.jrarrays=true
+veritestingMode=5
+recursiveDepth=200
+singlePathOptimization=true
+
+listener=gov.nasa.jpf.symbc.VeritestingListener
+symbolic.debug=true
